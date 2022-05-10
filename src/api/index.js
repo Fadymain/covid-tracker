@@ -3,25 +3,31 @@ import CountryPicker from "../components/CountryPicker/CountryPicker";
 
 const url = "https://covid19.mathdro.id/api";
 
-export const fetchData = async () => {
+export const fetchData = async (country) => {
+  let changeableUrl = url;
+
+  if (country) {
+    changeableUrl = `${url}/countries/${country}`
+  }
+
   try {
-    const { data: { confirmed, recovered, deaths, lastUpdate } } = await axios.get(url);
+    const { data: { confirmed, recovered, deaths, lastUpdate } } = await axios.get(changeableUrl);
 
 
 
     return { confirmed, recovered, deaths, lastUpdate };
   } catch (error) {
-
+    console.log('error', error);
   }
 };
 
 export const fetchDailyData = async () => {
   try {
-    const { data } = await axios.get(`${url}/daily`);
+    const { data } = await axios.get('https://api.covidtracking.com/v1/us/daily.json');
 
-    return data.map(({ confirmed, deaths, reportDate: date }) => ({
-      confirmed: confirmed.total,
-      deaths: deaths.total,
+    return data.map(({ positive, recovered, death, dateChecked: date }) => ({
+      confirmed: positive,
+      recovered, deaths: death,
       date
     }));
 
@@ -34,7 +40,7 @@ export const fetchDailyData = async () => {
 
 export const fetchCountries = async () => {
   try {
-    const { data: { countries } } = await axios.get(`${url}/countrues`);
+    const { data: { countries } } = await axios.get('https://api.covidtracking.com/v1/us/daily.json');
 
     return countries.map((country) => country.name)
 
